@@ -45,15 +45,15 @@ CREATE TABLE MeasureTypes (
 GO
 
 INSERT INTO Meteo (id, Name) VALUES
-(1, N'Яндекс Погода'),
-(2, N'Гугл Погода'),
-(3, N'Майл Погода')
+(1, N'Yandex meteo'),
+(2, N'Google meteo'),
+(3, N'Yahoo! meteo')
 GO
 
 INSERT INTO MeasureTypes (id, Name, Measure) VALUES
-(1, N'Влажность', N'г/м3'),
-(2, N'Температура', N'градусов'),
-(3, N'Давление', N'Па')
+(1, N'Р’Р»Р°Р¶РЅРѕСЃС‚СЊ', N'С€С‚'),
+(2, N'РўРµРјРїРµСЂР°С‚СѓСЂР°', N'РіСЂР°РґСѓСЃРѕРІ'),
+(3, N'Р”Р°РІР»РµРЅРёРµ', N'РџР°')
 GO
 
 IF OBJECT_ID('_Starkov.Measures', 'U') IS NOT NULL
@@ -98,11 +98,11 @@ INSERT INTO Measures (Station_id, Measure_id, CatchTime, Measure_Count, Value) V
 	(3, 1, '20160915', 4, 30)
 GO
 
-SELECT t.Name as "Тип измерения", 
-	   s.Name as "Метеостанция",
-	   CONVERT(varchar, m.CatchTime, 106) as "Время измерения",	
-	   ROUND(AVG(m.Value*m.Measure_count), 1) as "Среднее значение", 
-	   t.Measure as "Единицы"
+SELECT t.Name as "РўРёРї РёР·РјРµСЂРµРЅРёСЏ", 
+	   s.Name as "РЎС‚Р°РЅС†РёСЏ",
+	   CONVERT(varchar, m.CatchTime, 106) as "Р’СЂРµРјСЏ РёР·РјРµСЂРµРЅРёСЏ",	
+	   ROUND(AVG(m.Value*m.Measure_count), 1) as "РЎСЂРµРґРЅРµРµ", 
+	   t.Measure as "Г…Г¤ГЁГ­ГЁГ¶Г»"
 FROM Measures m
 INNER JOIN MeasureTypes t
     ON t.id = m.Measure_id
@@ -111,12 +111,12 @@ INNER JOIN Meteo s
 GROUP BY m.CatchTime, t.Name, t.Measure, s.Name
 GO
 
-SELECT Value as "Температура"
+SELECT Value as "Р—РЅР°С‡РµРЅРёРµ"
 FROM Measures m
 WHERE m.Measure_id = 2
 GO
 
-SELECT ROUND(AVG(m.Value), 1) as "Средняя температура"
+SELECT ROUND(AVG(m.Value), 1) as "РЎСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ"
 FROM Measures m
 WHERE m.Measure_id = 2
 GO
