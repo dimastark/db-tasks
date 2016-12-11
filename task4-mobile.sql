@@ -83,7 +83,7 @@ begin
 	declare @min float = 0; declare @minName varchar(100);
 	select @min = min(dbo.Median(name, @previous, @current)) from Plans
 	select @minName = name from Plans where @min = dbo.Median(name, @previous, @current)
-	print(N'Èíòåğâàë: ' 
+	print(N'Ğ˜Ğ½Ñ‚ĞµÑ€Ğ²Ğ°Ğ»: ' 
 			+ convert(varchar(100), @previous, 3) 
 			+ ' -> ' 
 			+  convert(varchar(100), @current, 3)
