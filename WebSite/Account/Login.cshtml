@@ -1,0 +1,85 @@
+﻿@* Удалите этот раздел, если используется объединение *@
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Вход";
+
+    //Context.RedirectLocal(returnUrl);
+    //Response.Redirect("~/Account/AccountLockedOut");
+
+    // Инициализировать общие переменные страницы
+    var login = "";
+    var password = "";
+    var rememberMe = false;
+
+    var returnUrl = Request.QueryString["ReturnUrl"];
+    if (returnUrl.IsEmpty()) {
+        // Некоторые внешние поставщики входа в систему требуют всегда указывать URL-адрес возврата
+        returnUrl = Href("~/");
+    }
+
+    // Setup validation
+    Validation.RequireField("login", "Необходимо указать логин");
+    Validation.RequireField("password", "Необходимо указать пароль");
+
+    // Если получен запрос POST, выполняется проверка и обработка данных
+    if (IsPost) {
+        AntiForgery.Validate();
+        if (Validation.IsValid()) {
+            login = Request.Form["login"];
+            password = Request.Form["password"];
+            rememberMe = Request.Form["rememberMe"].AsBool();
+
+            var db = Database.Open("Starkov");
+            var user = db.FindUser(login);
+            if (user != null && user["password"] == password)
+            {
+                FormsAuthentication.SetAuthCookie(login, true);
+                Response.Redirect("~/");
+            }
+            else {
+                ModelState.AddFormError("Неверное имя пользователя или пароль");
+            }
+        }
+    }
+}
+
+<hgroup class="title">
+    <h1>@Page.Title</h1>
+</hgroup>
+
+<section id="loginForm">
+    <form method="post">
+        @AntiForgery.GetHtml()
+        @* Если при проверке обнаружена хотя бы одна ошибка, покажите ошибку *@
+        @Html.ValidationSummary("При входе в систему произошла ошибка", excludeFieldErrors: true, htmlAttributes: null)
+
+        <fieldset>
+            <legend>Войдите в свою учетную запись</legend>
+            <ol>
+                <li class="login">
+                    <label for="login" @if (!ModelState.IsValidField("login"))
+                                       {<text>class="error-label"</text>}>Логин</label>
+                    <input type="text" id="login" name="login" value="@login" @Validation.For("login")/>
+                    @* Записать все ошибки проверки имени пользователя на странице *@
+                    @Html.ValidationMessage("login")
+                </li>
+                <li class="password">
+                    <label for="password" @if (!ModelState.IsValidField("password")) {<text>class="error-label"</text>}>Пароль</label>
+                    <input type="password" id="password" name="password" @Validation.For("password")/>
+                    @* Записать все ошибки проверки пароля на странице *@
+                    @Html.ValidationMessage("password")
+                </li>
+                @*<li class="remember-me">
+        <input type="checkbox" id="rememberMe" name="rememberMe" value="true" checked="@rememberMe" />
+        <label class="checkbox" for="rememberMe">Запомнить меня</label>
+    </li>*@
+            </ol>
+            <input type="submit" value="Вход" />
+        </fieldset>
+    </form>
+</section>

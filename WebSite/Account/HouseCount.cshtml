@@ -1,0 +1,13 @@
+﻿@{
+    var locCode = Request.QueryString["street"];
+
+    var sql = @"SELECT count(NAME) FROM [Starkov].[dbo].houses "
+        + " WHERE CODE LIKE @0 + '%'";
+
+    using (var db = Database.Open("Starkov"))
+    {
+        var data = db.QueryValue(sql, locCode);
+        Json.Write(data, Response.Output);
+    }
+
+}

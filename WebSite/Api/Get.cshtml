@@ -1,0 +1,26 @@
+﻿@{
+    var obj = Request.QueryString["object"];
+    var code = Request.QueryString["code"];
+    var sql = @"";
+    if (obj.Equals("region"))
+    {
+        sql += "SELECT SS, FULLNAME, [INDEX] FROM [Starkov].[dbo].regions where SS='" + code + "'";
+    }
+    else if (obj.Equals("locality"))
+    {
+        sql += "SELECT CODE, CUR_FULLNAME AS FULLNAME, [INDEX] FROM [Starkov].[dbo].localities where SS + RRR + GGG + PPP='" + code + "'";
+    }
+    else if (obj.Equals("street"))
+    {
+        var locCode = Request.QueryString["loc"].ToString();
+        sql += "SELECT YYYY, FULLNAME, [INDEX] FROM [Starkov].[dbo].streets WHERE CODE = '" + locCode + "' AND YYYY = '" + code + "'";
+    }
+    else if (obj.Equals("house"))
+    {
+        sql += "SELECT SUBSTRING(CODE, 16, 4) AS HHHH, NAME, [INDEX] FROM [Starkov].[dbo].DOMA WHERE CODE = '" + code + "' ";
+    }
+
+    var db = Database.Open("Starkov");
+    var data = db.Query(sql).SingleOrDefault();
+    Json.Write(data, Response.Output);
+}

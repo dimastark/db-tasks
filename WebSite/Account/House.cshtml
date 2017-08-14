@@ -1,0 +1,14 @@
+﻿@{
+    var locCode = Request.QueryString["street"];
+
+    var sql = @"SELECT SUBSTRING(CODE, 16, 4) AS HHHH, NAME, [INDEX] "
+        + " FROM [Starkov].[dbo].DOMA "
+        + " WHERE CODE LIKE @0 + '%' ";
+
+    using (var db = Database.Open("Starkov"))
+    {
+        var data = db.Query(sql, locCode);
+        Json.Write(data, Response.Output);
+    }
+
+}

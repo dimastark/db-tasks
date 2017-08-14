@@ -1,0 +1,48 @@
+﻿@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.min.js"></script>
+    <script src="~/Scripts/knockout-2.3.0.debug.js"></script>
+    <script src="~/Scripts/knockout-2.3.0.js"></script>
+    <script src="~/Scripts/knockout-jqAutocomplete.js"></script>
+    <script src="~/Scripts/spin.js"></script>
+    <script src="~/Scripts/jquery-spin.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Scripts/dashboard.js"></script>
+}
+
+@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Панель управления";
+}
+
+<hgroup class="title">
+    <h1>@Page.Title.</h1>
+    <h2 id="loginValue">@Request.QueryString["login"]</h2>
+</hgroup>
+
+<section>
+    <h5>Написать письмо</h5>
+    <form data-bind="submit: sendLetter">
+        <ol style="list-style: none;">
+            <li>
+                <label for="to">Кому</label>
+                <hr>
+                <div class="mrg" id="to" data-bind="foreach: gotUsers">
+                    <input type="checkbox" data-bind="value: address, attr: {name: login, id: login}, checked: $root.usersToSend" />
+                    <label data-bind="attr: {for: login}, text: fullname"></label>
+                </div>
+                <hr>
+            </li>
+            <li>
+                <label for="letterText">Текст письма</label>
+                <textarea data-bind="value: textToSend"></textarea>
+            </li>
+            <li>
+                <button type="submit">Отправить</button>
+            </li>
+        </ol>
+    </form>
+    <iframe id="my_iframe" style="display:none;"></iframe>
+</section>

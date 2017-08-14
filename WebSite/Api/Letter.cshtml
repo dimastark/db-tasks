@@ -1,0 +1,44 @@
+﻿@using Novacode
+@functions
+{
+
+    public static string FormatUser(string user)
+    {
+        return user;
+    }
+}
+
+@{
+    var usersToSend = FormatUser(Request.QueryString["users"])
+        .Split(';')
+        .Where(x => x != "");
+    var text = Request.QueryString["text"];
+
+    string fileName = @"C:\Users\dimastark\Desktop\letter.docx";
+    if (File.Exists(fileName))
+    {
+        File.Delete(fileName);
+    }
+
+    var doc = DocX.Create(fileName);
+
+    foreach (var user in usersToSend)
+    {
+        doc.InsertParagraph("Кому: ");
+        foreach (var part in user.Split(',').Where(x => x != ""))
+        {
+            doc.InsertParagraph(part);
+        }
+        doc.InsertParagraph();
+        doc.InsertParagraph(text);
+        //doc.InsertPageBreak();
+    }
+    doc.Save();
+
+    HttpResponse Response1 = HttpContext.Current.Response;
+    Response1.Clear();
+    Response1.ContentType = "application/msword";
+    Response1.AppendHeader("Content-Disposition", "attachment; filename=letter.docx");
+    Response1.TransmitFile(fileName);
+    Response1.End();
+}

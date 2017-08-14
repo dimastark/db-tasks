@@ -1,0 +1,12 @@
+﻿@{
+    var regionCode = Request.QueryString["region"].ToString();
+    var search = Request.QueryString["search"].ToString();
+
+    var db = Database.Open("Starkov");
+    var sql = @"SELECT CODE, CUR_FULLNAME AS FULLNAME, [INDEX] FROM [Starkov].[dbo].localities WHERE SS = '" + regionCode + "' ";
+    sql += " AND NAME LIKE '%" + search + "%' ";
+    sql = sql + "ORDER BY FULLNAME";
+    var data = db.Query(sql);
+    Json.Write(data, Response.Output);
+    db.Close();
+}

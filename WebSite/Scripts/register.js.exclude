@@ -1,0 +1,175 @@
+﻿/* Пример почтового адреса
+
+    Толмачевой Нине Ивановне
+    ул.Карла Маркса, д.60 кв.154,
+    г.Екатеринбург,
+    Свердловская обл.
+    индекс
+*/
+
+ViewModel = function (data) {
+    var self = this;
+    self.name = ko.observable('');
+    self.secondname = ko.observable('');
+    self.sirname = ko.observable('');
+    self.login = ko.observable('');
+    self.password = ko.observable('');
+
+    self.region = ko.observable("");
+    self.locality = ko.observable("");
+    self.street = ko.observable("");
+    self.house = ko.observable("");
+
+    self.noStreet = ko.observable(false);
+    self.noHouse = ko.observable(false);
+    self.hlocality = ko.computed(function () {
+        if (self.locality() === '' || self.locality() === undefined)
+            return '' + self.locality();
+
+        $.getJSON("/Account/StreetCount?locality=" + self.locality(), function (data) {
+            console.log(data);
+            if (data == 0) {
+                self.noStreet(true);
+                self.street("0000");
+            }
+            else {
+                self.noStreet(false);
+                self.street(undefined);
+            }
+        });
+
+        $.getJSON("/Account/HouseCount.cshtml?street=" + self.locality(), function (data) {
+            console.log(data);
+            if (data == 0) {
+                self.noHouse(true);
+                self.house("0000");
+                self.houseName("");
+                self.flatName("");
+            }
+            else {
+                self.noHouse(false);
+                self.house(undefined);
+            }
+        });
+        return "" + self.locality();
+    });
+
+    self.hstreet = ko.computed(function () {
+        if (self.street() === '' || self.street() === undefined)
+            return self.street();
+
+        $.getJSON("/Account/HouseCount.cshtml?street=" + self.locality() + self.street(), function (data) {
+            console.log(data);
+            if (data == 0) {
+                self.noHouse(true);
+                self.house("0000");
+                self.houseName("");
+                self.flatName("");
+            }
+            else {
+                self.noHouse(false);
+                self.house(undefined);
+            }
+        });
+    });
+
+    self.houseName = ko.observable("");
+    self.flatName = ko.observable("");
+
+    self.address = ko.observable("");
+
+    self.regions = ko.observableArray([]);
+    self.localities = ko.observableArray([]);
+    self.streets = ko.observableArray([]);
+    self.houses = ko.observableArray([]);
+
+    self.addUser = function () {
+        var url = '/Account/AddUser?'
+        url += 'name=' + self.name();
+        url += '&secondname=' + self.secondname();
+        url += '&sirname=' + self.sirname();
+        url += '&locality=' + self.locality();
+        url += '&street=' + self.street();
+        url += '&house=' + self.house();
+        url += '&houseName=' + self.houseName();
+        url += '&flatName=' + self.flatName();
+        url += "&login=" + self.login();
+        url += "&password=" + self.password();
+
+        $.post(url, data, function (returnedData) {
+            console.log(returnedData);
+            console.log('successfully added');
+            window.location.href = '/Account/Thanks?login=' + self.login();
+        })
+    }
+
+    self.updateRegions = function () {
+        $('#spinner').spin();
+        $.getJSON("/Account/Region", function (data) {
+            var mapped = [];
+            //mapped.push(new Region({ SS: '00', FULLNAME: '', INDEX: '' }));
+            $.map(data, function (item) { mapped.push(new Region(item)); });
+            self.regions(mapped);
+            $('#spinner').spin(false);
+        });
+    }
+    self.updateRegions();
+
+    self.updateLocalities = function (searchTerm, callback) {
+        console.log(self.region());
+        $('#spinner').spin();
+        $.getJSON("/Account/Locality?region=" + self.region() + "&search=" + searchTerm, function (data) {
+            var mapped = [];
+            $.map(data, function (item) { mapped.push(new Locality(item)); });
+            self.localities(mapped);
+        }).done(function () {
+            callback(self.localities());
+            $('#spinner').spin(false);
+        }).fail(function () {
+            $('#spinner').spin(false);
+        }).error(function () {
+            $('#spinner').spin(false);
+        });
+    }
+
+    self.updateStreets = function (searchTerm, callback) {
+        console.log(self.locality());
+        $('#spinner').spin();
+        $.getJSON("/Account/Street?locality=" + self.locality() + "&search=" + searchTerm, function (data) {
+            var mapped = [];
+            $.map(data, function (item) { mapped.push(new Street(item)); });
+            if (mapped.length == 0)
+                mapped.push(new Street({ name: '', code: '0000' }));
+            self.streets(mapped);
+        }).done(function () {
+            callback(self.streets());
+            $('#spinner').spin(false);
+        }).fail(function () {
+            $('#spinner').spin(false);
+        }).error(function () {
+            $('#spinner').spin(false);
+        });
+    }
+
+    self.updateHouses = function () {
+        console.log(self.street());
+        if (self.street() === undefined || self.street() === '')
+            self.street('0000');
+
+        $('#spinner').spin();
+        $.getJSON("/Account/House?street=" + self.locality() + self.street() + "&search=" + self.houseName(), function (data) {
+            if (data.length > 0) {
+                self.house(data[0].HHHH);
+                console.log(self.house());
+            }
+        }).done(function () {
+            $('#spinner').spin(false);
+        }).fail(function () {
+            $('#spinner').spin(false);
+        }).error(function () {
+            $('#spinner').spin(false);
+        });
+    }
+}
+
+ko.applyBindings(new ViewModel([]));

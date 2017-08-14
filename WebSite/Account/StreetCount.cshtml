@@ -1,0 +1,9 @@
+﻿@{
+    var locCode = Request.QueryString["locality"].ToString();
+
+    var db = Database.Open("Starkov");
+    var sql = @"SELECT count(FULLNAME) FROM [Starkov].[dbo].streets WHERE CODE LIKE '" + locCode + "%' ";
+    var data = db.QueryValue(sql);
+    Json.Write(data, Response.Output);
+    db.Close();
+}

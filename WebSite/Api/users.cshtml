@@ -1,0 +1,37 @@
+﻿@using System.Collections.Specialized
+
+@functions
+{
+    public static string[] GetUserFields(NameValueCollection formData)
+    {
+        return new []
+        {
+            formData["name"], formData["secondname"], formData["sirname"],
+            formData["locality"], formData["street"], formData["house"],
+            formData["houseName"], formData["flatName"],
+            formData["login"], formData["password"]
+        };
+    }
+}
+
+@if (IsPost)
+{
+    var form = Request.Form;
+    using (var db = Database.Open("Starkov"))
+    {
+        if (db.IsUserExists(form["login"]))
+        {
+            db.DeleteUser(form["login"]);
+        }
+        db.CreateUser(GetUserFields(form));
+    }
+}
+else
+{
+    var login = Request.QueryString["login"];
+    using (var db = Database.Open("Starkov"))
+    {
+        var output = login != null ? db.FindUser(login) : db.FindUsers();
+        Json.Write(output, Response.Output);
+    }
+}

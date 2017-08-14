@@ -1,0 +1,30 @@
+﻿p 
+{
+    font-size: 16px;
+}
+
+.letter
+{
+    padding: 30px;
+}
+
+.from,
+.to
+{
+    background-color: #ddd;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+.from
+{
+    border-bottom: 1px solid #ccc;
+}
+
+.text
+{
+    padding: 40px 20px;
+    background-color: #f6f6f6;
+    margin: 0;
+    font-size: 24px;
+}

@@ -1,0 +1,108 @@
+﻿@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.min.js"></script>
+    <script src="~/Scripts/knockout-2.3.0.debug.js"></script>
+    <script src="~/Scripts/knockout-2.3.0.js"></script>
+    <script src="~/Scripts/knockout-jqAutocomplete.js"></script>
+    <script src="~/Scripts/spin.js"></script>
+    <script src="~/Scripts/jquery-spin.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Scripts/dashboard.js"></script>
+}
+
+@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Панель управления";
+}
+
+<hgroup class="title">
+    <h1>@Page.Title.</h1>
+    <h2 id="loginValue">@Request.QueryString["login"]</h2>
+</hgroup>
+
+<form method="post">
+    @AntiForgery.GetHtml()
+    @Html.ValidationSummary("Не удалось создать учетную запись. Исправьте ошибки и повторите попытку.", excludeFieldErrors: true, htmlAttributes: null)
+    <fieldset>
+        <legend>Панель управления пользователя</legend>
+        <ol>
+            <li>
+                <label for="index">Индекс</label>
+                <input disabled data-bind="value: index" id="index" />
+            </li>
+            <li>
+                <label for="region">Регион</label>
+                <div data-bind="visible: editRegion() || editLocality() || editStreet()" class="spinner-form" id="spinner"></div>
+                <input id="selectedRegion" data-bind="visible: !editRegion(), value: selectedRegion" />
+                <input id="region" data-bind="visible: editRegion(), jqAuto: { value: region, source: regions, inputProp: 'name', labelProp: 'name', options: {minLength: 2}}" />
+            </li>
+            <li>
+                <label for="locality">Населенный пункт</label>
+                <input id="selectedLocality" data-bind="value: selectedLocality, visible: !editLocality()" />
+                <input id="locality" data-bind="visible: editLocality(), jqAuto: { value: locality, source: updateLocalities, inputProp: 'name', labelProp: 'name', options: {minLength: 2}}" />
+            </li>
+            <li data-bind="visible: hasStreet()">
+                <label for="street">Улица</label>
+                <input id="selectedStreet" data-bind="value: selectedStreet, visible: !editStreet()" />
+                <input id="street" data-bind="visible: editStreet(), jqAuto: { value: street, source: updateStreets, inputProp: 'name', labelProp: 'name', options: {minLength: 2}}" />
+            </li>
+            <li data-bind="visible: hasHouse()">
+                <label for="house">Дом</label>
+                <input id="selectedHouse" data-bind="value: selectedHouse, visible: !editHouse()" />
+                <input id="house" data-bind="visible: editHouse(), value: houseName" />
+            </li>
+            <li data-bind="visible: hasHouse()">
+                <label for="flat">Квартира</label>
+                <input id="selectedFlat" data-bind="value: selectedFlat, visible: !editFlat()" />
+                <input id="flat" data-bind="visible: editFlat(), value: flatName" />
+            </li>
+            <li>
+                <label for="sirname">Фамилия</label>
+                <input id="sirname" data-bind="value: sirname" />
+            </li>
+            <li>
+                <label for="name">Имя</label>
+                <input id="name" data-bind="value: name" />
+            </li>
+            <li>
+                <label for="secondname">Отчество</label>
+                <input id="secondname" data-bind="value: secondname" />
+            </li>
+            <li>
+                <label for="login">Логин</label>
+                <input id="login" data-bind="value: login" />
+            </li>
+            <li>
+                <label for="password">Пароль</label>
+                <input id="password" type="password" data-bind="value: password" />
+            </li>
+        </ol>
+        <input type="submit" value="Сохранить изменения" data-bind="click: addUser" />
+    </fieldset>
+</form>
+<hr>
+<section data-bind="visible: isAdmin()">
+    <h5>Написать письмо</h5>
+    <form data-bind="submit: sendLetter">
+        <ol style="list-style: none;">
+            <li>
+                <label for="to">Кому</label>
+                <hr>
+                <div id="to" data-bind="foreach: gotUsers">
+                    <label data-bind="attr: {for: login}, text: fullname"></label>
+                    <input type="checkbox" data-bind="value: address, attr: {name: login}, checked: $root.usersToSend"/>
+                </div>
+                <hr>
+            </li>
+            <li>
+                <label for="letterText">Текст письма</label>
+                <textarea data-bind="value: textToSend"></textarea>
+            </li>
+            <li>
+                <button type="submit">Отправить</button>
+            </li>
+        </ol>
+    </form>
+</section>

@@ -1,0 +1,6 @@
+﻿@{
+    var db = Database.Open("Starkov");
+    var sql = @"SELECT SS, FULLNAME, [INDEX] FROM [Starkov].[dbo].regions ORDER BY FULLNAME";
+    var data = db.Query(sql);
+    Json.Write(data, Response.Output);
+}

@@ -1,0 +1,25 @@
+﻿@{
+    var locCode = Request.QueryString["locality"].ToString();
+    var searchTerm = Request.QueryString["search"].ToString();
+
+    var db = Database.Open("Starkov");
+
+	var withTowns = locCode.Length == 8;
+
+    var sql = @"SELECT s.PPP, s.YYYY, ";
+	if (withTowns) {
+		sql += "CASE WHEN s.code = CONCAT('" + locCode + "', '000') THEN s.FULLNAME ELSE CONCAT(s.FULLNAME, ' (', l.CUR_FULLNAME, ')') END AS FULLNAME";
+	} else {
+		sql += "s.FULLNAME";
+	}
+	sql += ", s.[INDEX] FROM [Starkov].[dbo].streets s ";
+	if (withTowns) {
+		sql += "JOIN [Starkov].[dbo].localities l ON s.CODE = l.CODE ";  
+	}
+	sql += " WHERE s.CODE LIKE '" + locCode + "%' ";
+    sql += "AND s.FULLNAME LIKE '%" + searchTerm + "%' ";
+    sql += "ORDER BY s.FULLNAME";
+    var data = db.Query(sql);
+    Json.Write(data, Response.Output);
+    db.Close();
+}

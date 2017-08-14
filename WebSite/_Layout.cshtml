@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8" />
+        <title>@Page.Title</title>
+        <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+        <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+        <link href="~/Content/b.css" rel="stylesheet" type="text/css" />
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <link href="https://fonts.googleapis.com/css?family=Anonymous+Pro" rel="stylesheet">
+        <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+        <script src="~/Scripts/jquery-ui-1.10.3.js"></script>
+        <script src="~/Scripts/modernizr-2.6.2.js"></script>
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    @if (WebSecurity.IsAuthenticated)
+                    {
+                        <text>
+                        <section id="other">
+                            <ul>
+                                <li><a class="nav-button" href="~/Account/EditProfile?login=@(User.Identity.Name)">Редакировать данные</a></li>
+                                @if (User.Identity.Name.ToLower() == "admin")
+                                {
+                                    <li><a class="nav-button" href="~/Account/SendMail">Отправить письмо</a></li>
+                                }
+                            </ul>
+                        </section>
+                        </text>
+                    }
+                </div>
+                <div class="float-right">
+                    <section id="login">
+                        @if (WebSecurity.IsAuthenticated) {
+                            <text>
+                                <span class="nav-text">Hello, <span class="email">@WebSecurity.CurrentUserName</span>!</span>
+                                <form id="logoutForm" action="~/Account/Logout" method="post">
+                                    @AntiForgery.GetHtml()
+                                    <a class="nav-button" href="javascript:document.getElementById('logoutForm').submit()">Выйти</a>
+                                </form>
+                            </text>
+                        } else {
+                            <ul>
+                                <li><a class="nav-button" href="~/Account/Register">Регистрация</a></li>
+                                <li><a class="nav-button" href="~/Account/Login">Вход</a></li>
+                            </ul>
+                        }
+                    </section>
+                </div>
+            </div>
+        </header>
+    <div id="body">
+        <div id="left"></div>
+        <div id="right"></div>
+        <div id="top"></div>
+        <div id="bottom"></div>
+        @RenderSection("featured", false)
+        <section class="content-wrapper main-content clear-fix">
+            @RenderBody()
+        </section>
+    </div>
+        @RenderSection("Scripts", false)
+    </body>
+</html>
